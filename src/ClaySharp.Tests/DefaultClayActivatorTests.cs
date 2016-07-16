@@ -5,44 +5,53 @@ using System.Text;
 using ClaySharp.Behaviors;
 using NUnit.Framework;
 
-namespace ClaySharp.Tests {
+namespace ClaySharp.Tests
+{
     [TestFixture]
-    public class DefaultClayActivatorTests {
+    public class DefaultClayActivatorTests
+    {
         private IClayActivator _activator;
 
         [SetUp]
-        public void Init() {
+        public void Init()
+        {
             _activator = new DefaultClayActivator();
             ClayActivator.ServiceLocator = () => _activator;
         }
 
         [Test]
-        public void SimpleActivationUsesDefaultClass() {
+        public void SimpleActivationUsesDefaultClass()
+        {
             var alpha = ClayActivator.CreateInstance(Enumerable.Empty<IClayBehavior>());
             var type = alpha.GetType();
 
             Assert.That(type, Is.EqualTo(typeof(Clay)));
         }
 
-        public class ClayPlus : Clay {
+        public class ClayPlus : Clay
+        {
             public ClayPlus(IEnumerable<IClayBehavior> behaviors)
-                : base(behaviors) {
+                : base(behaviors)
+            {
             }
 
             public virtual string Hello { get { return "World"; } }
 
-            public virtual int Add(int left, int right) {
+            public virtual int Add(int left, int right)
+            {
                 return left + right;
             }
         }
 
-        public interface IClayPlus {
+        public interface IClayPlus
+        {
             string Hello { get; }
             int Add(int left, int right);
         }
 
         [Test]
-        public void ClaySubclassIsActivatedWithoutDynamicProxy() {
+        public void ClaySubclassIsActivatedWithoutDynamicProxy()
+        {
             var alpha = ClayActivator.CreateInstance<ClayPlus>(Enumerable.Empty<IClayBehavior>());
             var type = alpha.GetType();
 
@@ -50,7 +59,8 @@ namespace ClaySharp.Tests {
         }
 
         [Test]
-        public void SubclassMembersRemainAvailableStaticallyAndDynamicallyAndViaInterface() {
+        public void SubclassMembersRemainAvailableStaticallyAndDynamicallyAndViaInterface()
+        {
 
             var alpha = ClayActivator.CreateInstance<ClayPlus>(new[] { new InterfaceProxyBehavior() });
 
@@ -70,24 +80,29 @@ namespace ClaySharp.Tests {
         }
 
 
-        public class Anything {
+        public class Anything
+        {
             private readonly string _helloText;
 
-            public Anything() {
+            public Anything()
+            {
             }
-            public Anything(string helloText) {
+            public Anything(string helloText)
+            {
                 _helloText = helloText;
             }
 
             public virtual string Hello { get { return _helloText ?? "World"; } }
 
-            public virtual int Add(int left, int right) {
+            public virtual int Add(int left, int right)
+            {
                 return left + right;
             }
         }
 
         [Test]
-        public void ClaySubclassFromAnythingIsActivatedDynamixProxyAddingDlrInterfaces() {
+        public void ClaySubclassFromAnythingIsActivatedDynamixProxyAddingDlrInterfaces()
+        {
             var alpha = ClayActivator.CreateInstance<Anything>(Enumerable.Empty<IClayBehavior>());
 
             var type = alpha.GetType();
@@ -98,7 +113,8 @@ namespace ClaySharp.Tests {
         }
 
         [Test]
-        public void SubclassFromAnythingMembersRemainAvailableStaticallyAndDynamicallyAndViaInterface() {
+        public void SubclassFromAnythingMembersRemainAvailableStaticallyAndDynamicallyAndViaInterface()
+        {
             var alpha = ClayActivator.CreateInstance<Anything>(new[] { new InterfaceProxyBehavior() });
             var type = alpha.GetType();
             Assert.That(type, Is.Not.EqualTo(typeof(Anything)));
@@ -120,10 +136,11 @@ namespace ClaySharp.Tests {
 
 
         [Test]
-        public void BehaviorsCanFilterVirtualMethods() {
+        public void BehaviorsCanFilterVirtualMethods()
+        {
 
-            var alpha = ClayActivator.CreateInstance<Anything>(new IClayBehavior[] { 
-                new InterfaceProxyBehavior(), 
+            var alpha = ClayActivator.CreateInstance<Anything>(new IClayBehavior[] {
+                new InterfaceProxyBehavior(),
                 new AnythingModifier() });
 
             dynamic dynamically = alpha;
@@ -141,15 +158,20 @@ namespace ClaySharp.Tests {
             Assert.That(interfacially.Add(3, 6), Is.EqualTo(11));
         }
 
-        class AnythingModifier : ClayBehavior {
-            public override object InvokeMember(Func<object> proceed, object self, string name, INamedEnumerable<object> args) {
-                if (name == "Add") {
+        class AnythingModifier : ClayBehavior
+        {
+            public override object InvokeMember(Func<object> proceed, object self, string name, INamedEnumerable<object> args)
+            {
+                if (name == "Add")
+                {
                     return (int)proceed() + 2;
                 }
                 return proceed();
             }
-            public override object GetMember(Func<object> proceed, object self, string name) {
-                if (name == "Hello") {
+            public override object GetMember(Func<object> proceed, object self, string name)
+            {
+                if (name == "Hello")
+                {
                     return "[" + proceed() + "]";
                 }
 

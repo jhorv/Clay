@@ -2,24 +2,29 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ClaySharp.Behaviors {
-    public class ArrayPropAssignmentBehavior : ClayBehavior {
+namespace ClaySharp.Behaviors
+{
+    public class ArrayPropAssignmentBehavior : ClayBehavior
+    {
 
-        public override object InvokeMember(Func<object> proceed, object self, string name, INamedEnumerable<object> args) {
+        public override object InvokeMember(Func<object> proceed, object self, string name, INamedEnumerable<object> args)
+        {
             return
                 IfSingleArray(args, arr => { ((dynamic)self)[name] = arr; return self; }, () =>
                     IfTwoOrMoreArgs(args, arr => { ((dynamic)self)[name] = arr; return self; },
                         proceed));
         }
 
-        private object IfTwoOrMoreArgs(IEnumerable<object> args, Func<dynamic, object> func, Func<object> proceed) {
+        private object IfTwoOrMoreArgs(IEnumerable<object> args, Func<dynamic, object> func, Func<object> proceed)
+        {
             if (args.Count() < 2)
                 return proceed();
 
             return func(NewArray().AddRange(args));
         }
 
-        private object IfSingleArray(IEnumerable<object> args, Func<dynamic, object> func, Func<object> proceed) {
+        private object IfSingleArray(IEnumerable<object> args, Func<dynamic, object> func, Func<object> proceed)
+        {
             if (args.Count() != 1)
                 return proceed();
 
@@ -33,12 +38,13 @@ namespace ClaySharp.Behaviors {
             return func(NewArray().AddRange(arr));
         }
 
-        private static dynamic NewArray() {
+        private static dynamic NewArray()
+        {
             return new Clay(
                 new InterfaceProxyBehavior(),
                 new PropBehavior(),
                 new ArrayPropAssignmentBehavior(),
-                new ArrayBehavior(), 
+                new ArrayBehavior(),
                 new NilResultBehavior());
         }
     }

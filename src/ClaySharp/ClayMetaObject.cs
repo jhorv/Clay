@@ -6,8 +6,10 @@ using System.Linq.Expressions;
 using System.Reflection;
 using ClaySharp.Implementation;
 
-namespace ClaySharp {
-    public class ClayMetaObject : DynamicMetaObject {
+namespace ClaySharp
+{
+    public class ClayMetaObject : DynamicMetaObject
+    {
         // ReSharper disable InconsistentNaming
         private static readonly MethodInfo IClayBehavior_InvokeMember = typeof(IClayBehavior).GetMethod("InvokeMember");
         private static readonly MethodInfo IClayBehavior_GetMember = typeof(IClayBehavior).GetMethod("GetMember");
@@ -25,34 +27,40 @@ namespace ClaySharp {
         // ReSharper restore InconsistentNaming
 
         public ClayMetaObject(object value, Expression expression)
-            : base(expression, BindingRestrictions.Empty, value) {
+            : base(expression, BindingRestrictions.Empty, value)
+        {
             Logger = NullLogger.Instance;
         }
-        
-        public ClayMetaObject(object value, Expression expression, Func<Expression,Expression> getClayBehavior)
-            : this(value,expression) {
+
+        public ClayMetaObject(object value, Expression expression, Func<Expression, Expression> getClayBehavior)
+            : this(value, expression)
+        {
             _getClayBehavior = getClayBehavior;
         }
 
         public ILogger Logger { get; set; }
 
-        private Expression GetLimitedSelf() {
-            if (Expression.Type == LimitType || Expression.Type.IsEquivalentTo(LimitType)) {
+        private Expression GetLimitedSelf()
+        {
+            if (Expression.Type == LimitType || Expression.Type.IsEquivalentTo(LimitType))
+            {
                 return Expression;
             }
             return Expression.Convert(Expression, LimitType);
         }
 
-        readonly Func<Expression,Expression> _getClayBehavior = expr=> Expression.Property(
-                Expression.Convert(expr, typeof(IClayBehaviorProvider)),
-                "Behavior");
+        readonly Func<Expression, Expression> _getClayBehavior = expr => Expression.Property(
+                 Expression.Convert(expr, typeof(IClayBehaviorProvider)),
+                 "Behavior");
 
-        protected virtual Expression GetClayBehavior() {
+        protected virtual Expression GetClayBehavior()
+        {
             return _getClayBehavior(Expression);
         }
 
 
-        public override DynamicMetaObject BindGetMember(GetMemberBinder binder) {
+        public override DynamicMetaObject BindGetMember(GetMemberBinder binder)
+        {
             Logger.Log(LogLevel.Debug, null, "BindGetMember");
 
             var binderDefault = binder.FallbackGetMember(this);
@@ -77,7 +85,8 @@ namespace ClaySharp {
             return binder.FallbackGetMember(this, dynamicSuggestion);
         }
 
-        public override DynamicMetaObject BindSetMember(SetMemberBinder binder, DynamicMetaObject value) {
+        public override DynamicMetaObject BindSetMember(SetMemberBinder binder, DynamicMetaObject value)
+        {
             Logger.Log(LogLevel.Debug, null, "BindSetMember");
 
             var binderDefault = binder.FallbackSetMember(this, value);
@@ -103,7 +112,8 @@ namespace ClaySharp {
             return binder.FallbackSetMember(this, value, dynamicSuggestion);
         }
 
-        public override DynamicMetaObject BindInvokeMember(InvokeMemberBinder binder, DynamicMetaObject[] args) {
+        public override DynamicMetaObject BindInvokeMember(InvokeMemberBinder binder, DynamicMetaObject[] args)
+        {
             Logger.Log(LogLevel.Debug, null, "BindInvokeMember");
 
             var argValues = Expression.NewArrayInit(typeof(object), args.Select(x => Expression.Convert(x.Expression, typeof(Object))));
@@ -135,7 +145,8 @@ namespace ClaySharp {
         }
 
 
-        public override DynamicMetaObject BindConvert(ConvertBinder binder) {
+        public override DynamicMetaObject BindConvert(ConvertBinder binder)
+        {
             Logger.Log(LogLevel.Debug, null, "BindConvert");
 
             var binderDefault = binder.FallbackConvert(this);
@@ -166,13 +177,15 @@ namespace ClaySharp {
         }
 
 
-        public override DynamicMetaObject BindDeleteMember(DeleteMemberBinder binder) {
+        public override DynamicMetaObject BindDeleteMember(DeleteMemberBinder binder)
+        {
             Logger.Log(LogLevel.Debug, null, "BindUnaryOperation");
 
             throw new NotImplementedException();
         }
 
-        public override DynamicMetaObject BindGetIndex(GetIndexBinder binder, DynamicMetaObject[] indexes) {
+        public override DynamicMetaObject BindGetIndex(GetIndexBinder binder, DynamicMetaObject[] indexes)
+        {
             Logger.Log(LogLevel.Debug, null, "BindGetIndex");
 
             var a2 = Expression.NewArrayInit(typeof(object), indexes.Select(x => Expression.Convert(x.Expression, typeof(Object))));
@@ -189,7 +202,8 @@ namespace ClaySharp {
             return new DynamicMetaObject(call, BindingRestrictions.GetTypeRestriction(Expression, LimitType).Merge(binderFallback.Restrictions));
         }
 
-        public override DynamicMetaObject BindSetIndex(SetIndexBinder binder, DynamicMetaObject[] indexes, DynamicMetaObject value) {
+        public override DynamicMetaObject BindSetIndex(SetIndexBinder binder, DynamicMetaObject[] indexes, DynamicMetaObject value)
+        {
             Logger.Log(LogLevel.Debug, null, "BindSetIndex");
 
             var a2 = Expression.NewArrayInit(typeof(object), indexes.Select(x => Expression.Convert(x.Expression, typeof(Object))));
@@ -207,13 +221,15 @@ namespace ClaySharp {
             return new DynamicMetaObject(call, BindingRestrictions.GetTypeRestriction(Expression, LimitType).Merge(binderFallback.Restrictions));
         }
 
-        public override DynamicMetaObject BindDeleteIndex(DeleteIndexBinder binder, DynamicMetaObject[] indexes) {
+        public override DynamicMetaObject BindDeleteIndex(DeleteIndexBinder binder, DynamicMetaObject[] indexes)
+        {
             Logger.Log(LogLevel.Debug, null, "BindDeleteIndex");
 
             throw new NotImplementedException();
         }
 
-        public override DynamicMetaObject BindInvoke(InvokeBinder binder, DynamicMetaObject[] args) {
+        public override DynamicMetaObject BindInvoke(InvokeBinder binder, DynamicMetaObject[] args)
+        {
             Logger.Log(LogLevel.Debug, null, "BindInvoke");
 
             var argValues = Expression.NewArrayInit(typeof(object), args.Select(x => Expression.Convert(x.Expression, typeof(Object))));
@@ -233,19 +249,22 @@ namespace ClaySharp {
             return new DynamicMetaObject(call, BindingRestrictions.GetTypeRestriction(Expression, LimitType).Merge(binderFallback.Restrictions));
         }
 
-        public override DynamicMetaObject BindCreateInstance(CreateInstanceBinder binder, DynamicMetaObject[] args) {
+        public override DynamicMetaObject BindCreateInstance(CreateInstanceBinder binder, DynamicMetaObject[] args)
+        {
             Logger.Log(LogLevel.Debug, null, "BindCreateInstance");
 
             throw new NotImplementedException();
         }
 
-        public override DynamicMetaObject BindUnaryOperation(UnaryOperationBinder binder) {
+        public override DynamicMetaObject BindUnaryOperation(UnaryOperationBinder binder)
+        {
             Logger.Log(LogLevel.Debug, null, "BindUnaryOperation");
 
             throw new NotImplementedException();
         }
 
-        public override DynamicMetaObject BindBinaryOperation(BinaryOperationBinder binder, DynamicMetaObject arg) {
+        public override DynamicMetaObject BindBinaryOperation(BinaryOperationBinder binder, DynamicMetaObject arg)
+        {
             Logger.Log(LogLevel.Debug, null, "BindBinaryOperation");
 
             var binderFallback = binder.FallbackBinaryOperation(this, arg);
@@ -261,7 +280,8 @@ namespace ClaySharp {
             return new DynamicMetaObject(call, BindingRestrictions.GetTypeRestriction(Expression, LimitType));
         }
 
-        public override IEnumerable<string> GetDynamicMemberNames() {
+        public override IEnumerable<string> GetDynamicMemberNames()
+        {
             Logger.Log(LogLevel.Debug, null, "GetDynamicMemberNames");
 
             throw new NotImplementedException();

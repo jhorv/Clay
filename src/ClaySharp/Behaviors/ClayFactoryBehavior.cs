@@ -4,9 +4,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.CSharp.RuntimeBinder;
 
-namespace ClaySharp.Behaviors {
-    public class ClayFactoryBehavior : ClayBehavior {
-        public override object InvokeMember(Func<object> proceed, object self, string name, INamedEnumerable<object> args) {
+namespace ClaySharp.Behaviors
+{
+    public class ClayFactoryBehavior : ClayBehavior
+    {
+        public override object InvokeMember(Func<object> proceed, object self, string name, INamedEnumerable<object> args)
+        {
 
             dynamic shape = new Clay(
                 new InterfaceProxyBehavior(),
@@ -16,13 +19,15 @@ namespace ClaySharp.Behaviors {
 
             shape.ShapeName = name;
 
-            if (args.Positional.Count() == 1) {
+            if (args.Positional.Count() == 1)
+            {
                 var options = args.Positional.Single();
                 var assigner = GetAssigner(options.GetType());
                 assigner.Invoke(shape, options);
             }
 
-            foreach (var kv in args.Named) {
+            foreach (var kv in args.Named)
+            {
                 shape[kv.Key] = kv.Value;
             }
 
@@ -31,8 +36,10 @@ namespace ClaySharp.Behaviors {
 
 
 
-        private static Action<dynamic, object> GetAssigner(Type sourceType) {
-            lock (_assignerCache) {
+        private static Action<dynamic, object> GetAssigner(Type sourceType)
+        {
+            lock (_assignerCache)
+            {
                 Action<dynamic, object> assigner;
                 if (_assignerCache.TryGetValue(sourceType, out assigner))
                     return assigner;

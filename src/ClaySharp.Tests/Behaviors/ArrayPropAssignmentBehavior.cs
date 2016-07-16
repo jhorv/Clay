@@ -4,11 +4,14 @@ using System.Linq;
 using ClaySharp.Behaviors;
 using NUnit.Framework;
 
-namespace ClaySharp.Tests.Behaviors {
+namespace ClaySharp.Tests.Behaviors
+{
     [TestFixture]
-    public class ArrayPropAssignmentBehaviorTests {
+    public class ArrayPropAssignmentBehaviorTests
+    {
         [Test]
-        public void SingleArrayArgumentBecomesDynamic() {
+        public void SingleArrayArgumentBecomesDynamic()
+        {
             dynamic alpha = new Clay(new PropBehavior(), new ArrayPropAssignmentBehavior());
 
             alpha
@@ -28,7 +31,8 @@ namespace ClaySharp.Tests.Behaviors {
         }
 
         [Test]
-        public void InvokeMemberWithSeveralArgumentsImpliesArrayInitialization() {
+        public void InvokeMemberWithSeveralArgumentsImpliesArrayInitialization()
+        {
             dynamic alpha = new Clay(new PropBehavior(), new ArrayPropAssignmentBehavior());
 
             alpha

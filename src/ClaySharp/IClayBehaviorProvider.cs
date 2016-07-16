@@ -1,5 +1,7 @@
-﻿namespace ClaySharp {
-    public interface IClayBehaviorProvider {
+﻿namespace ClaySharp
+{
+    public interface IClayBehaviorProvider
+    {
         IClayBehavior Behavior { get; }
     }
 }

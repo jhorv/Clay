@@ -4,15 +4,19 @@ using System.Dynamic;
 using System.Linq.Expressions;
 using Castle.DynamicProxy;
 
-namespace ClaySharp {
-    public class DefaultClayActivator : IClayActivator {
+namespace ClaySharp
+{
+    public class DefaultClayActivator : IClayActivator
+    {
         static readonly IProxyBuilder _builder = new DefaultProxyBuilder();
 
-        public dynamic CreateInstance(Type baseType, IEnumerable<IClayBehavior> behaviors, IEnumerable<object> arguments) {
+        public dynamic CreateInstance(Type baseType, IEnumerable<IClayBehavior> behaviors, IEnumerable<object> arguments)
+        {
             var isDynamicMetaObjectProvider = typeof(IDynamicMetaObjectProvider).IsAssignableFrom(baseType);
             var isClayBehaviorProvider = typeof(IClayBehaviorProvider).IsAssignableFrom(baseType);
 
-            if (isDynamicMetaObjectProvider && isClayBehaviorProvider) {
+            if (isDynamicMetaObjectProvider && isClayBehaviorProvider)
+            {
                 var constructorArguments = new object[] { behaviors };
                 return Activator.CreateInstance(baseType, constructorArguments);
             }
@@ -21,12 +25,14 @@ namespace ClaySharp {
 
             var options = new ProxyGenerationOptions();
             var constructorArgs = new List<object>();
-            if (!isClayBehaviorProvider) {
+            if (!isClayBehaviorProvider)
+            {
                 var mixin = new MixinClayBehaviorProvider(behaviors);
                 options.AddMixinInstance(mixin);
                 constructorArgs.Add(mixin);
             }
-            if (!isDynamicMetaObjectProvider) {
+            if (!isDynamicMetaObjectProvider)
+            {
                 var mixin = new MixinDynamicMetaObjectProvider();
                 options.AddMixinInstance(mixin);
                 constructorArgs.Add(mixin);
@@ -36,29 +42,34 @@ namespace ClaySharp {
 
             var proxyType = _builder.CreateClassProxyType(baseType, Type.EmptyTypes, options);
 
-            constructorArgs.Add(new IInterceptor[]{new ClayInterceptor()});
+            constructorArgs.Add(new IInterceptor[] { new ClayInterceptor() });
             if (arguments != null)
                 constructorArgs.AddRange(arguments);
 
             return contextualize(Activator.CreateInstance(proxyType, constructorArgs.ToArray()));
         }
 
-        class MixinClayBehaviorProvider : IClayBehaviorProvider {
+        class MixinClayBehaviorProvider : IClayBehaviorProvider
+        {
             private readonly IClayBehavior _behavior;
 
-            public MixinClayBehaviorProvider(IEnumerable<IClayBehavior> behaviors) {
+            public MixinClayBehaviorProvider(IEnumerable<IClayBehavior> behaviors)
+            {
                 _behavior = new ClayBehaviorCollection(behaviors);
             }
 
-            IClayBehavior IClayBehaviorProvider.Behavior {
+            IClayBehavior IClayBehaviorProvider.Behavior
+            {
                 get { return _behavior; }
             }
         }
 
-        class MixinDynamicMetaObjectProvider : IDynamicMetaObjectProvider {
+        class MixinDynamicMetaObjectProvider : IDynamicMetaObjectProvider
+        {
             public object Instance { get; set; }
 
-            DynamicMetaObject IDynamicMetaObjectProvider.GetMetaObject(Expression expression) {
+            DynamicMetaObject IDynamicMetaObjectProvider.GetMetaObject(Expression expression)
+            {
                 return new ClayMetaObject(Instance, expression);
             }
         }

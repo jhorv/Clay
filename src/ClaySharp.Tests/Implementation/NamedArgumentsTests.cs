@@ -5,27 +5,33 @@ using System.Text;
 using ClaySharp.Implementation;
 using NUnit.Framework;
 
-namespace ClaySharp.Tests.Implementation {
+namespace ClaySharp.Tests.Implementation
+{
     [TestFixture]
-    public class NamedArgumentsTests {
+    public class NamedArgumentsTests
+    {
 
-        private INamedEnumerable<int> AllNamed() {
+        private INamedEnumerable<int> AllNamed()
+        {
             return Arguments.FromT(new[] { 1, 2, 3 }, new[] { "a", "b", "c" });
         }
 
-        private INamedEnumerable<int> AllPositional() {
+        private INamedEnumerable<int> AllPositional()
+        {
             return Arguments.FromT(new[] { 1, 2, 3 }, Enumerable.Empty<string>());
         }
 
         [Test]
-        public void ZeroNamesGivesYouEntirelyPositionalArguments() {
+        public void ZeroNamesGivesYouEntirelyPositionalArguments()
+        {
             var args = AllPositional();
             Assert.That(args.Count(), Is.EqualTo(3));
             Assert.That(args.Positional.Count(), Is.EqualTo(3));
             Assert.That(args.Named.Count(), Is.EqualTo(0));
         }
         [Test]
-        public void EqualNamesGivesYouEntirelyNamedArguments() {
+        public void EqualNamesGivesYouEntirelyNamedArguments()
+        {
             var args = AllNamed();
             Assert.That(args.Count(), Is.EqualTo(3));
             Assert.That(args.Positional.Count(), Is.EqualTo(0));
@@ -33,18 +39,22 @@ namespace ClaySharp.Tests.Implementation {
         }
 
         [Test]
-        public void IteratingEmptyNamedAndPositionalCollections() {
-            foreach (var named in AllPositional().Named) {
+        public void IteratingEmptyNamedAndPositionalCollections()
+        {
+            foreach (var named in AllPositional().Named)
+            {
                 Assert.Fail("Should not have named items");
             }
 
-            foreach (var positional in AllNamed().Positional) {
+            foreach (var positional in AllNamed().Positional)
+            {
                 Assert.Fail("Should not have positional items");
             }
         }
 
         [Test]
-        public void ContainsKeyWorksOnNames() {
+        public void ContainsKeyWorksOnNames()
+        {
             var args = AllNamed();
             Assert.That(args.Named.ContainsKey("a"), Is.True);
             Assert.That(args.Named.ContainsKey("d"), Is.False);
@@ -55,7 +65,8 @@ namespace ClaySharp.Tests.Implementation {
         }
 
         [Test]
-        public void ContainsWorksOnNameArgumentPairs() {
+        public void ContainsWorksOnNameArgumentPairs()
+        {
             var args = AllNamed();
             Assert.That(args.Named.Contains(new KeyValuePair<string, int>("a", 1)), Is.True);
             Assert.That(args.Named.Contains(new KeyValuePair<string, int>("a", 2)), Is.False);
@@ -64,7 +75,8 @@ namespace ClaySharp.Tests.Implementation {
 
 
         [Test]
-        public void NamedKeysCollectionIsAvailable() {
+        public void NamedKeysCollectionIsAvailable()
+        {
             var args = AllNamed();
             Assert.That(args.Named.Keys.Count(), Is.EqualTo(3));
             Assert.That(args.Named.Keys.Aggregate(">", (a, b) => a + b), Is.EqualTo(">abc"));
@@ -75,7 +87,8 @@ namespace ClaySharp.Tests.Implementation {
         }
 
         [Test]
-        public void NamedValueCollectionIsAvailable() {
+        public void NamedValueCollectionIsAvailable()
+        {
             var args = AllNamed();
             Assert.That(args.Named.Values.Count(), Is.EqualTo(3));
             Assert.That(args.Named.Values.Aggregate(">", (a, b) => a + b), Is.EqualTo(">123"));
@@ -86,7 +99,8 @@ namespace ClaySharp.Tests.Implementation {
         }
 
         [Test]
-        public void NamedCollectionIsAvailable() {
+        public void NamedCollectionIsAvailable()
+        {
             var args = AllNamed();
             Assert.That(args.Named.Count(), Is.EqualTo(3));
             Assert.That(args.Named.Aggregate(">", (a, b) => a + b.Key + b.Value), Is.EqualTo(">a1b2c3"));
@@ -97,7 +111,8 @@ namespace ClaySharp.Tests.Implementation {
         }
 
         [Test]
-        public void NameIndexerWorksAsExpectedWithDefaultValueOnKeyMiss() {
+        public void NameIndexerWorksAsExpectedWithDefaultValueOnKeyMiss()
+        {
             var args = AllNamed();
             Assert.That(args.Named["a"], Is.EqualTo(1));
             Assert.That(args.Named["b"], Is.EqualTo(2));

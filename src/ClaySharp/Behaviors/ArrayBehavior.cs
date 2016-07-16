@@ -3,20 +3,26 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ClaySharp.Behaviors {
-    public class ArrayBehavior : ClayBehavior {
+namespace ClaySharp.Behaviors
+{
+    public class ArrayBehavior : ClayBehavior
+    {
         readonly List<object> _data = new List<object>();
 
-        public override object GetIndex(Func<object> proceed, object self, IEnumerable<object> keys) {
+        public override object GetIndex(Func<object> proceed, object self, IEnumerable<object> keys)
+        {
             return IfSingleInteger(keys, key => _data[key], proceed);
         }
 
-        public override object SetIndex(Func<object> proceed, object self, IEnumerable<object> keys, object value) {
+        public override object SetIndex(Func<object> proceed, object self, IEnumerable<object> keys, object value)
+        {
             return IfSingleInteger(keys, key => _data[key] = value, proceed);
         }
 
-        public override object GetMember(Func<object> proceed, object self, string name) {
-            switch (name) {
+        public override object GetMember(Func<object> proceed, object self, string name)
+        {
+            switch (name)
+            {
                 case "Length":
                 case "Count":
                     return _data.Count;
@@ -27,8 +33,10 @@ namespace ClaySharp.Behaviors {
         }
 
 
-        public override object InvokeMember(Func<object> proceed, object self, string name, INamedEnumerable<object> args) {
-            switch (name) {
+        public override object InvokeMember(Func<object> proceed, object self, string name, INamedEnumerable<object> args)
+        {
+            switch (name)
+            {
                 case "AddRange":
                     _data.AddRange(((IEnumerable)args.Single()).OfType<object>());
                     return self;
@@ -46,14 +54,16 @@ namespace ClaySharp.Behaviors {
                 case "Remove":
                     return IfSingleArgument(args, arg => _data.Remove(arg), proceed);
                 case "CopyTo":
-                    return IfArguments<object[], int>(args, (array, arrayIndex) => {
+                    return IfArguments<object[], int>(args, (array, arrayIndex) =>
+                    {
                         _data.CopyTo(array, arrayIndex);
                         return self;
                     }, proceed);
 
             }
 
-            if (!args.Any()) {
+            if (!args.Any())
+            {
                 return GetMember(proceed, self, name);
             }
 
@@ -62,25 +72,29 @@ namespace ClaySharp.Behaviors {
 
 
 
-        private static object IfArguments<T1, T2>(IEnumerable<object> args, Func<T1, T2, object> func, Func<object> proceed) {
+        private static object IfArguments<T1, T2>(IEnumerable<object> args, Func<T1, T2, object> func, Func<object> proceed)
+        {
             if (args.Count() != 2)
                 return proceed();
             return func((T1)args.First(), (T2)args.Last());
         }
 
 
-        private static object IfSingleArgument(IEnumerable<object> args, Func<object, object> func, Func<object> proceed) {
+        private static object IfSingleArgument(IEnumerable<object> args, Func<object, object> func, Func<object> proceed)
+        {
             return args.Count() == 1 ? func(args.Single()) : proceed();
         }
 
-        private static object IfSingleInteger(IEnumerable<object> args, Func<int, object> func, Func<object> proceed) {
+        private static object IfSingleInteger(IEnumerable<object> args, Func<int, object> func, Func<object> proceed)
+        {
             if (args.Count() != 1)
                 return proceed();
 
             return IfInitialInteger(args, (index, ignored) => func(index), proceed);
         }
 
-        private static object IfInitialInteger(IEnumerable<object> args, Func<int, IEnumerable<object>, object> func, Func<object> proceed) {
+        private static object IfInitialInteger(IEnumerable<object> args, Func<int, IEnumerable<object>, object> func, Func<object> proceed)
+        {
             if (!args.Any())
                 return proceed();
 
@@ -92,20 +106,24 @@ namespace ClaySharp.Behaviors {
             return func((int)key, args.Skip(1));
         }
 
-    
-    
+
+
         // small, dynamic wrapper around underlying IEnumerator. use of
         // dlr and dynamic proxy enables this enumerator to be used in places
         // where the array is being cast into a strong collection interface
-        class EnumeratorBehavior : ClayBehavior {
+        class EnumeratorBehavior : ClayBehavior
+        {
             private readonly IEnumerator _enumerator;
 
-            public EnumeratorBehavior(IEnumerator enumerator) {
+            public EnumeratorBehavior(IEnumerator enumerator)
+            {
                 _enumerator = enumerator;
             }
 
-            public override object InvokeMember(Func<object> proceed, object self, string name, INamedEnumerable<object> args) {
-                switch (name) {
+            public override object InvokeMember(Func<object> proceed, object self, string name, INamedEnumerable<object> args)
+            {
+                switch (name)
+                {
                     case "MoveNext":
                         return _enumerator.MoveNext();
                     case "Reset":
@@ -119,13 +137,16 @@ namespace ClaySharp.Behaviors {
                 return proceed();
             }
 
-            public override object GetMember(Func<object> proceed, object self, string name) {
-                switch (name) {
+            public override object GetMember(Func<object> proceed, object self, string name)
+            {
+                switch (name)
+                {
                     case "Current":
                         return _enumerator.Current;
                 }
                 return proceed();
             }
-        }}
+        }
+    }
 
 }

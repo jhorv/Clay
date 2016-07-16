@@ -6,32 +6,42 @@ using ClaySharp.Behaviors;
 using Microsoft.CSharp.RuntimeBinder;
 using NUnit.Framework;
 
-namespace ClaySharp.Tests {
+namespace ClaySharp.Tests
+{
     [TestFixture]
-    public class BinderFallbackTests {
+    public class BinderFallbackTests
+    {
 
-        class TestMemberBehavior : ClayBehavior {
-            public override object InvokeMember(Func<object> proceed, object self, string name, INamedEnumerable<object> args) {
+        class TestMemberBehavior : ClayBehavior
+        {
+            public override object InvokeMember(Func<object> proceed, object self, string name, INamedEnumerable<object> args)
+            {
                 return name == "Sample" ? "Data" : proceed();
             }
-            public override object GetMember(Func<object> proceed, object self, string name) {
+            public override object GetMember(Func<object> proceed, object self, string name)
+            {
                 return name == "Sample" ? "Data" : proceed();
             }
-            public override object SetMember(Func<object> proceed, object self, string name, object value) {
+            public override object SetMember(Func<object> proceed, object self, string name, object value)
+            {
                 return name == "Sample" ? "Data" : proceed();
             }
         }
 
-        class TestIndexBehavior : ClayBehavior {
-            public override object GetIndex(Func<object> proceed, object self, IEnumerable<object> keys) {
+        class TestIndexBehavior : ClayBehavior
+        {
+            public override object GetIndex(Func<object> proceed, object self, IEnumerable<object> keys)
+            {
                 return IsIndexZero(keys) ? "Data" : proceed();
             }
 
-            public override object SetIndex(Func<object> proceed, object self, IEnumerable<object> keys, object value) {
+            public override object SetIndex(Func<object> proceed, object self, IEnumerable<object> keys, object value)
+            {
                 return IsIndexZero(keys) ? "Data" : proceed();
             }
 
-            private static bool IsIndexZero(IEnumerable<object> keys) {
+            private static bool IsIndexZero(IEnumerable<object> keys)
+            {
                 return keys.Count() == 1
                     && keys.Single().GetType() == typeof(int)
                     && keys.Cast<int>().Single() == 0;
@@ -40,7 +50,8 @@ namespace ClaySharp.Tests {
 
 
         [Test]
-        public void InvokeMemberThrowsFallbackException() {
+        public void InvokeMemberThrowsFallbackException()
+        {
             dynamic alpha = new Object();
             dynamic beta = new Clay(new TestMemberBehavior());
 
@@ -58,7 +69,8 @@ namespace ClaySharp.Tests {
 
 
         [Test]
-        public void GetMemberThrowsFallbackException() {
+        public void GetMemberThrowsFallbackException()
+        {
             dynamic alpha = new Object();
             dynamic beta = new Clay(new TestMemberBehavior());
 
@@ -74,7 +86,8 @@ namespace ClaySharp.Tests {
         }
 
         [Test]
-        public void SetMemberThrowsFallbackException() {
+        public void SetMemberThrowsFallbackException()
+        {
             dynamic alpha = new Object();
             dynamic beta = new Clay(new TestMemberBehavior());
 
@@ -92,7 +105,8 @@ namespace ClaySharp.Tests {
 
 
         [Test]
-        public void GetIndexThrowsFallbackException() {
+        public void GetIndexThrowsFallbackException()
+        {
             dynamic alpha = new Object();
             dynamic beta = new Clay(new TestMemberBehavior());
 
@@ -105,7 +119,8 @@ namespace ClaySharp.Tests {
 
 
         [Test]
-        public void SetIndexThrowsFallbackException() {
+        public void SetIndexThrowsFallbackException()
+        {
             dynamic alpha = new Object();
             dynamic beta = new Clay(new TestMemberBehavior());
 
@@ -119,21 +134,27 @@ namespace ClaySharp.Tests {
 
         }
 
-        public interface IAlpha {
+        public interface IAlpha
+        {
             string Hello();
             string Foo();
         }
-        public class Alpha {
-            public virtual string Hello() {
+        public class Alpha
+        {
+            public virtual string Hello()
+            {
                 return "World";
             }
         }
 
-        public class AlphaBehavior : ClayBehavior {
-            public override object InvokeMember(Func<object> proceed, object self, string name, INamedEnumerable<object> args) {
+        public class AlphaBehavior : ClayBehavior
+        {
+            public override object InvokeMember(Func<object> proceed, object self, string name, INamedEnumerable<object> args)
+            {
                 return proceed() + "-";
             }
-            public override object InvokeMemberMissing(Func<object> proceed, object self, string name, INamedEnumerable<object> args) {
+            public override object InvokeMemberMissing(Func<object> proceed, object self, string name, INamedEnumerable<object> args)
+            {
                 if (name == "Foo")
                     return "Bar";
                 return proceed();
@@ -141,10 +162,11 @@ namespace ClaySharp.Tests {
         }
 
         [Test]
-        public void TestInvokePaths() {
-            var dynamically = ClayActivator.CreateInstance<Alpha>(new IClayBehavior[] { 
-                new InterfaceProxyBehavior(), 
-                new AlphaBehavior() 
+        public void TestInvokePaths()
+        {
+            var dynamically = ClayActivator.CreateInstance<Alpha>(new IClayBehavior[] {
+                new InterfaceProxyBehavior(),
+                new AlphaBehavior()
             });
             Alpha statically = dynamically;
             IAlpha interfacially = dynamically;
@@ -160,17 +182,22 @@ namespace ClaySharp.Tests {
         }
 
 
-        public class Beta {
-            public virtual string Hello {
+        public class Beta
+        {
+            public virtual string Hello
+            {
                 get { return "World"; }
             }
         }
 
-        public class BetaBehavior : ClayBehavior {
-            public override object GetMember(Func<object> proceed, object self, string name) {
+        public class BetaBehavior : ClayBehavior
+        {
+            public override object GetMember(Func<object> proceed, object self, string name)
+            {
                 return proceed() + "-";
             }
-            public override object GetMemberMissing(Func<object> proceed, object self, string name) {
+            public override object GetMemberMissing(Func<object> proceed, object self, string name)
+            {
                 if (name == "Foo")
                     return "Bar";
                 return proceed();
@@ -178,7 +205,8 @@ namespace ClaySharp.Tests {
         }
 
         [Test]
-        public void TestGetPaths() {
+        public void TestGetPaths()
+        {
             var dynamically = ClayActivator.CreateInstance<Beta>(new[] { new BetaBehavior() });
             Beta statically = dynamically;
 

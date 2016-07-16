@@ -6,26 +6,33 @@ using Microsoft.CSharp.RuntimeBinder;
 using Castle.DynamicProxy;
 using ClaySharp.Implementation;
 
-namespace ClaySharp {
-    public class ClayInterceptor : IInterceptor {
+namespace ClaySharp
+{
+    public class ClayInterceptor : IInterceptor
+    {
         private const string GetPrefix = "get_";
         private const string SetPrefix = "set_";
 
-        public void Intercept(IInvocation invocation) {
+        public void Intercept(IInvocation invocation)
+        {
             var invocationDestinedForSelf = ReferenceEquals(invocation.InvocationTarget, invocation.Proxy);
-            if (!invocationDestinedForSelf) {
+            if (!invocationDestinedForSelf)
+            {
                 // don't intercept mixins
                 invocation.Proceed();
                 return;
             }
 
             var behaviorProvider = invocation.Proxy as IClayBehaviorProvider;
-            if (behaviorProvider != null) {
+            if (behaviorProvider != null)
+            {
                 var invocationMethod = invocation.Method;
                 if (invocationMethod.IsSpecialName &&
-                    invocationMethod.Name.StartsWith(GetPrefix)) {
+                    invocationMethod.Name.StartsWith(GetPrefix))
+                {
                     invocation.ReturnValue = behaviorProvider.Behavior.GetMember(
-                        () => {
+                        () =>
+                        {
                             invocation.Proceed();
                             return invocation.ReturnValue;
                         },
@@ -36,9 +43,11 @@ namespace ClaySharp {
                 }
                 if (invocationMethod.IsSpecialName &&
                     invocationMethod.Name.StartsWith(SetPrefix) &&
-                    invocation.Arguments.Count() == 1) {
+                    invocation.Arguments.Count() == 1)
+                {
                     invocation.ReturnValue = behaviorProvider.Behavior.SetMember(
-                        () => {
+                        () =>
+                        {
                             invocation.Proceed();
                             return invocation.ReturnValue;
                         },
@@ -49,7 +58,8 @@ namespace ClaySharp {
                     return;
                 }
 
-                if (!invocationMethod.IsSpecialName) {
+                if (!invocationMethod.IsSpecialName)
+                {
                     invocation.ReturnValue = behaviorProvider.Behavior.InvokeMember(
                         () => { invocation.Proceed(); return invocation.ReturnValue; },
                         invocation.Proxy,
@@ -64,7 +74,8 @@ namespace ClaySharp {
 
         static readonly ConcurrentDictionary<Type, CallSite<Func<CallSite, object, object>>> _convertSites = new ConcurrentDictionary<Type, CallSite<Func<CallSite, object, object>>>();
 
-        private static void AdjustReturnValue(IInvocation invocation) {
+        private static void AdjustReturnValue(IInvocation invocation)
+        {
             var methodReturnType = invocation.Method.ReturnType;
             if (methodReturnType == typeof(void))
                 return;

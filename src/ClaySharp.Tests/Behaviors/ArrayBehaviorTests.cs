@@ -6,11 +6,14 @@ using System.Text;
 using ClaySharp.Behaviors;
 using NUnit.Framework;
 
-namespace ClaySharp.Tests.Behaviors {
+namespace ClaySharp.Tests.Behaviors
+{
     [TestFixture]
-    public class ArrayBehaviorTests {
+    public class ArrayBehaviorTests
+    {
         [Test]
-        public void AddGrowsArray() {
+        public void AddGrowsArray()
+        {
             dynamic array = new Clay(new ArrayBehavior());
             array.Add("Alpha");
             array.Add("Beta");
@@ -21,7 +24,8 @@ namespace ClaySharp.Tests.Behaviors {
 
 
         [Test]
-        public void LengthAndCountShowCurrentSize() {
+        public void LengthAndCountShowCurrentSize()
+        {
             dynamic array = new Clay(new ArrayBehavior());
 
             Assert.That(array.Length, Is.EqualTo(0));
@@ -39,7 +43,8 @@ namespace ClaySharp.Tests.Behaviors {
         }
 
         [Test]
-        public void AddCallsCanBeChained() {
+        public void AddCallsCanBeChained()
+        {
             dynamic array = new Clay(new ArrayBehavior());
             array.Add("Alpha").Add("Beta");
 
@@ -48,7 +53,8 @@ namespace ClaySharp.Tests.Behaviors {
         }
 
         [Test]
-        public void AddTakesZeroOrMoreArguments() {
+        public void AddTakesZeroOrMoreArguments()
+        {
             dynamic array = new Clay(new ArrayBehavior());
             array.Add().Add("Alpha").Add(null).Add("Beta", "Gamma", "Delta");
 
@@ -79,7 +85,8 @@ namespace ClaySharp.Tests.Behaviors {
          * */
 
         [Test]
-        public void InsertAndRemoveAtIndexes() {
+        public void InsertAndRemoveAtIndexes()
+        {
             dynamic array = new Clay(new ArrayBehavior());
             array.Add("a", "b", "c", "d").Insert(2, "b++").RemoveAt(3);
 
@@ -92,7 +99,8 @@ namespace ClaySharp.Tests.Behaviors {
         }
 
         [Test]
-        public void InsertMayTakeSeveral() {
+        public void InsertMayTakeSeveral()
+        {
             dynamic array = new Clay(new ArrayBehavior());
             array.Add("a", "b", "c", "d").Insert(2, "b2", "b3", "b4").RemoveAt(3);
 
@@ -107,7 +115,8 @@ namespace ClaySharp.Tests.Behaviors {
 
 
         [Test]
-        public void ContainsRemoveAndIndexOfFunctionAsNormalListWouldDictate() {
+        public void ContainsRemoveAndIndexOfFunctionAsNormalListWouldDictate()
+        {
             dynamic array = new Clay(new ArrayBehavior());
             array.Add("a", "b", "c", "d");
 
@@ -124,13 +133,15 @@ namespace ClaySharp.Tests.Behaviors {
         }
 
         [Test]
-        public void IteratingListReturnsValues() {
+        public void IteratingListReturnsValues()
+        {
             dynamic array = new Clay(new ArrayBehavior(), new InterfaceProxyBehavior());
             array.Add("a", "b", "c", "d");
 
             var expectedCharacters = "abcd".GetEnumerator();
 
-            foreach (var item in array) {
+            foreach (var item in array)
+            {
                 Assert.That(expectedCharacters.MoveNext(), Is.True);
                 Assert.That(item, Is.EqualTo(expectedCharacters.Current.ToString()));
             }
@@ -138,7 +149,8 @@ namespace ClaySharp.Tests.Behaviors {
         }
 
         [Test]
-        public void CallingGetEnumeratorDirectlyOnDynamic() {
+        public void CallingGetEnumeratorDirectlyOnDynamic()
+        {
             dynamic array = new Clay(new ArrayBehavior(), new InterfaceProxyBehavior());
             array.Add("hello");
 
@@ -175,7 +187,8 @@ namespace ClaySharp.Tests.Behaviors {
          * */
 
         [Test]
-        public void UsingArrayWithVarietyOfCollectionInterfaces() {
+        public void UsingArrayWithVarietyOfCollectionInterfaces()
+        {
             dynamic array = new Clay(new InterfaceProxyBehavior(), new ArrayBehavior());
 
             array.Add("a", "b", "c", "d");
@@ -205,7 +218,8 @@ namespace ClaySharp.Tests.Behaviors {
         }
 
         [Test]
-        public void UsingViaSystemInterfacesWithLinqExtensionMethods() {
+        public void UsingViaSystemInterfacesWithLinqExtensionMethods()
+        {
             dynamic array = new Clay(new InterfaceProxyBehavior(), new ArrayBehavior());
 
             array.Add("a", "b", "c", "d", "e");
@@ -261,7 +275,8 @@ namespace ClaySharp.Tests.Behaviors {
         }
 
         [Test]
-        public void ArrayCombinesWithOtherBehaviors() {
+        public void ArrayCombinesWithOtherBehaviors()
+        {
             dynamic combo = new Clay(
                 new InterfaceProxyBehavior(),
                 new PropBehavior(),
@@ -296,7 +311,8 @@ namespace ClaySharp.Tests.Behaviors {
             Assert.That(c2.Aggregate(">", (a, b) => a + "(" + b + ")"), Is.EqualTo(">(alpha)(beta)"));
         }
 
-        public interface ICombo : ICollection<string> {
+        public interface ICombo : ICollection<string>
+        {
             string Hello { get; set; }
             string Again { get; set; }
             int Length { get; }
@@ -304,7 +320,8 @@ namespace ClaySharp.Tests.Behaviors {
             ISafeNilResult Extra { get; set; }
         }
 
-        public interface ISafeNilResult {
+        public interface ISafeNilResult
+        {
             string Title { get; set; }
             string Description { get; set; }
         }

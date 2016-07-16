@@ -12,11 +12,14 @@ using Microsoft.CSharp.RuntimeBinder;
 using NUnit.Framework;
 using Binder = Microsoft.CSharp.RuntimeBinder.Binder;
 
-namespace ClaySharp.Tests.Behaviors {
+namespace ClaySharp.Tests.Behaviors
+{
     [TestFixture]
-    public class ClayFactoryBehaviorTests {
+    public class ClayFactoryBehaviorTests
+    {
         [Test]
-        public void InvokingMethodsCreateDynamicObjectWithBehaviors() {
+        public void InvokingMethodsCreateDynamicObjectWithBehaviors()
+        {
             dynamic factory = new Clay(new ClayFactoryBehavior());
             object alpha = factory.Alpha();
 
@@ -26,7 +29,8 @@ namespace ClaySharp.Tests.Behaviors {
         }
 
         [Test]
-        public void DifferentInstanceCreatedEachCall() {
+        public void DifferentInstanceCreatedEachCall()
+        {
             dynamic factory = new Clay(new ClayFactoryBehavior());
             object alpha1 = factory.Alpha();
             object alpha2 = factory.Alpha();
@@ -35,7 +39,8 @@ namespace ClaySharp.Tests.Behaviors {
         }
 
         [Test]
-        public void FactoryMethodCopiesPropertiesOfOptionalArgument() {
+        public void FactoryMethodCopiesPropertiesOfOptionalArgument()
+        {
             dynamic factory = new Clay(new ClayFactoryBehavior());
             var alpha = factory.Alpha(new { One = 1, Two = "dos" });
             Assert.That(alpha.One, Is.EqualTo(1));
@@ -43,7 +48,8 @@ namespace ClaySharp.Tests.Behaviors {
         }
 
         [Test]
-        public void FactoryMethodUsesNamedParameters() {
+        public void FactoryMethodUsesNamedParameters()
+        {
             dynamic factory = new Clay(new ClayFactoryBehavior());
 
             var alpha = factory.Alpha(new { Red = "#f00" }, One: 1, Two: "dos");
