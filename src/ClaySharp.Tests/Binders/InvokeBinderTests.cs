@@ -14,16 +14,16 @@ namespace ClaySharp.Tests.Binders
         {
             dynamic clay = new Clay(new TestBehavior());
             var result = clay.Hello();
-            Assert.That(result, Is.StringContaining("[name:Hello]"));
-            Assert.That(result, Is.StringContaining("[count:0]"));
+            Assert.That(result, Does.Contain("[name:Hello]"));
+            Assert.That(result, Does.Contain("[count:0]"));
         }
         [Test]
         public void InvokeBinder()
         {
             dynamic clay = new Clay(new TestBehavior());
             var result = clay();
-            Assert.That(result, Is.StringContaining("[name:<null>]"));
-            Assert.That(result, Is.StringContaining("[count:0]"));
+            Assert.That(result, Does.Contain("[name:<null>]"));
+            Assert.That(result, Does.Contain("[count:0]"));
         }
 
         class TestBehavior : ClayBehavior
