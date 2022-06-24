@@ -13,8 +13,8 @@ namespace ClaySharp.Behaviors
 {
     public class InterfaceProxyBehavior : ClayBehavior
     {
-        private static readonly IProxyBuilder ProxyBuilder = new DefaultProxyBuilder();
-        static readonly MethodInfo DynamicMetaObjectProviderGetMetaObject = typeof(IDynamicMetaObjectProvider).GetMethod("GetMetaObject");
+        static readonly IProxyBuilder ProxyBuilder = new DefaultProxyBuilder();
+        static readonly MethodInfo DynamicMetaObjectProviderGetMetaObject = typeof(IDynamicMetaObjectProvider).GetMethod(nameof(IDynamicMetaObjectProvider.GetMetaObject));
 
         public override object ConvertMissing(Func<object> proceed, object self, Type type, bool isExplicit)
         {
@@ -81,14 +81,13 @@ namespace ClaySharp.Behaviors
 
             static readonly ConcurrentDictionary<MethodInfo, Action<IInvocation>> Invokers = new ConcurrentDictionary<MethodInfo, Action<IInvocation>>();
 
-            private static Action<IInvocation> BindInvoker(IInvocation invocation)
+            static Action<IInvocation> BindInvoker(IInvocation invocation)
             {
                 return Invokers.GetOrAdd(invocation.Method, CompileInvoker);
             }
 
-            private static Action<IInvocation> CompileInvoker(MethodInfo method)
+            static Action<IInvocation> CompileInvoker(MethodInfo method)
             {
-
                 var methodParameters = method.GetParameters();
                 var invocationParameter = Expression.Parameter(typeof(IInvocation), "invocation");
 
