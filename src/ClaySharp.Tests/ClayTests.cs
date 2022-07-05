@@ -7,13 +7,13 @@ using NUnit.Framework;
 
 namespace ClaySharp.Tests
 {
-
-
     [TestFixture]
     public class ClayTests
     {
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public ClayHelper S { get; set; }
         public dynamic New { get; set; }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         [SetUp]
         public void Init()
@@ -45,7 +45,6 @@ namespace ClaySharp.Tests
         {
             string FooSub { get; set; }
         }
-
 
         [Test]
         public void TypeCastToInterface()
@@ -87,9 +86,7 @@ namespace ClaySharp.Tests
             shape2.FooSub = "Yarg";
             Assert.That(test2.Bar.FooSub, Is.EqualTo("Yarg"));
             Assert.That(shape.Bar.FooSub, Is.EqualTo("Yarg"));
-
         }
-
 
         public interface ITestForm
         {
@@ -118,14 +115,12 @@ namespace ClaySharp.Tests
         [Test]
         public void CreateSyntax()
         {
-
             var form = New.Form(new { Misc = 4 })
                 .Actions(New.Fieldset()
                     .Save(New.Button().Value("Save").Id("Hello"))
                     .Cancel(New.Button().Value("Cancel")));
 
-
-            var bar = New.Foo(new { Bleah = (object)null });
+            var bar = New.Foo(new { Bleah = (object?)null });
 
             Assert.That(bar.Bleah(), Is.SameAs(Nil.Instance));
             Assert.That(bar.Bleah, Is.SameAs(Nil.Instance));
@@ -141,7 +136,6 @@ namespace ClaySharp.Tests
             var foo7 = (string)bar.Foo ?? "yarg";
 
             //            var foo8 = bar.Foo ? bar.Foo : (dynamic)"yarg";
-
 
             Assert.That(foo1, Is.SameAs(Nil.Instance));
             Assert.That(foo2, Is.Null);
@@ -311,7 +305,6 @@ namespace ClaySharp.Tests
 
         public class AugmentedObject : IDynamicMetaObjectProvider
         {
-
             public DynamicMetaObject GetMetaObject(Expression parameter)
             {
                 return new ClayMetaObject(this, parameter, ex => Expression.Constant(new FooIsBar(), typeof(IClayBehavior)));
@@ -335,13 +328,10 @@ namespace ClaySharp.Tests
             initialize(item);
             return item;
         }
-        public dynamic New(string shapeName)
-        {
-            return New(shapeName, item => { });
-        }
+
+        public dynamic New(string shapeName) =>
+            New(shapeName, item => { });
     }
-
-
 
     public static class ClayHelperExtensions
     {

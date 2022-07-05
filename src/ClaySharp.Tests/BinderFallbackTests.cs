@@ -11,43 +11,35 @@ namespace ClaySharp.Tests
     [TestFixture]
     public class BinderFallbackTests
     {
-
         class TestMemberBehavior : ClayBehavior
         {
-            public override object InvokeMember(Func<object> proceed, object self, string name, INamedEnumerable<object> args)
-            {
-                return name == "Sample" ? "Data" : proceed();
-            }
-            public override object GetMember(Func<object> proceed, object self, string name)
-            {
-                return name == "Sample" ? "Data" : proceed();
-            }
-            public override object SetMember(Func<object> proceed, object self, string name, object value)
-            {
-                return name == "Sample" ? "Data" : proceed();
-            }
+            public override object InvokeMember(Func<object> proceed, object self, string name, INamedEnumerable<object> args) =>
+                ReturnSampleOrProceed(proceed, name);
+
+            public override object GetMember(Func<object> proceed, object self, string name) =>
+                ReturnSampleOrProceed(proceed, name);
+
+            public override object SetMember(Func<object> proceed, object self, string name, object value) =>
+                ReturnSampleOrProceed(proceed, name);
+
+            static object ReturnSampleOrProceed(Func<object> proceed, string name) => name == "Sample" ? "Data" : proceed();
         }
 
         class TestIndexBehavior : ClayBehavior
         {
-            public override object GetIndex(Func<object> proceed, object self, IEnumerable<object> keys)
-            {
-                return IsIndexZero(keys) ? "Data" : proceed();
-            }
+            public override object GetIndex(Func<object> proceed, object self, IEnumerable<object> keys) =>
+                IsIndexZero(keys) ? "Data" : proceed();
 
-            public override object SetIndex(Func<object> proceed, object self, IEnumerable<object> keys, object value)
-            {
-                return IsIndexZero(keys) ? "Data" : proceed();
-            }
+            public override object SetIndex(Func<object> proceed, object self, IEnumerable<object> keys, object value) =>
+                IsIndexZero(keys) ? "Data" : proceed();
 
-            private static bool IsIndexZero(IEnumerable<object> keys)
+            static bool IsIndexZero(IEnumerable<object> keys)
             {
                 return keys.Count() == 1
                     && keys.Single().GetType() == typeof(int)
                     && keys.Cast<int>().Single() == 0;
             }
         }
-
 
         [Test]
         public void InvokeMemberThrowsFallbackException()
@@ -56,17 +48,13 @@ namespace ClaySharp.Tests
             dynamic beta = new Clay(new TestMemberBehavior());
 
             var ex1 = Assert.Throws<RuntimeBinderException>(() => alpha.Hello1());
-
-            Assert.That(ex1.Message, Does.EndWith("does not contain a definition for 'Hello1'"));
+            Assert.That(ex1!.Message, Does.EndWith("does not contain a definition for 'Hello1'"));
 
             var ex2 = Assert.Throws<RuntimeBinderException>(() => beta.Hello2());
-
-            Assert.That(ex2.Message, Does.EndWith("does not contain a definition for 'Hello2'"));
+            Assert.That(ex2!.Message, Does.EndWith("does not contain a definition for 'Hello2'"));
 
             Assert.That(beta.Sample(), Is.EqualTo("Data"));
-
         }
-
 
         [Test]
         public void GetMemberThrowsFallbackException()
@@ -75,12 +63,10 @@ namespace ClaySharp.Tests
             dynamic beta = new Clay(new TestMemberBehavior());
 
             var ex1 = Assert.Throws<RuntimeBinderException>(() => { var hi = alpha.Hello1; });
-
-            Assert.That(ex1.Message, Does.EndWith("does not contain a definition for 'Hello1'"));
+            Assert.That(ex1!.Message, Does.EndWith("does not contain a definition for 'Hello1'"));
 
             var ex2 = Assert.Throws<RuntimeBinderException>(() => { var hi = beta.Hello2; });
-
-            Assert.That(ex2.Message, Does.EndWith("does not contain a definition for 'Hello2'"));
+            Assert.That(ex2!.Message, Does.EndWith("does not contain a definition for 'Hello2'"));
 
             Assert.That(beta.Sample, Is.EqualTo("Data"));
         }
@@ -92,17 +78,14 @@ namespace ClaySharp.Tests
             dynamic beta = new Clay(new TestMemberBehavior());
 
             var ex1 = Assert.Throws<RuntimeBinderException>(() => { alpha.Hello1 = 1; });
-
-            Assert.That(ex1.Message, Does.EndWith("does not contain a definition for 'Hello1'"));
+            Assert.That(ex1!.Message, Does.EndWith("does not contain a definition for 'Hello1'"));
 
             var ex2 = Assert.Throws<RuntimeBinderException>(() => { beta.Hello2 = 2; });
-
-            Assert.That(ex2.Message, Does.EndWith("does not contain a definition for 'Hello2'"));
+            Assert.That(ex2!.Message, Does.EndWith("does not contain a definition for 'Hello2'"));
 
             var x = (beta.Sample = 3);
             Assert.That(x, Is.EqualTo("Data"));
         }
-
 
         [Test]
         public void GetIndexThrowsFallbackException()
@@ -111,12 +94,11 @@ namespace ClaySharp.Tests
             dynamic beta = new Clay(new TestMemberBehavior());
 
             var ex1 = Assert.Throws<RuntimeBinderException>(() => { var hi = alpha[0]; });
-            Assert.That(ex1.Message, Does.Match(@"Cannot apply indexing with \[\] to an expression of type .*"));
+            Assert.That(ex1!.Message, Does.Match(@"Cannot apply indexing with \[\] to an expression of type .*"));
 
             var ex2 = Assert.Throws<RuntimeBinderException>(() => { var hi = beta[0]; });
-            Assert.That(ex2.Message, Does.Match(@"Cannot apply indexing with \[\] to an expression of type .*"));
+            Assert.That(ex2!.Message, Does.Match(@"Cannot apply indexing with \[\] to an expression of type .*"));
         }
-
 
         [Test]
         public void SetIndexThrowsFallbackException()
@@ -125,13 +107,10 @@ namespace ClaySharp.Tests
             dynamic beta = new Clay(new TestMemberBehavior());
 
             var ex1 = Assert.Throws<RuntimeBinderException>(() => { alpha[0] = 1; });
-
-            Assert.That(ex1.Message, Does.Match(@"Cannot apply indexing with \[\] to an expression of type .*"));
+            Assert.That(ex1!.Message, Does.Match(@"Cannot apply indexing with \[\] to an expression of type .*"));
 
             var ex2 = Assert.Throws<RuntimeBinderException>(() => { beta[0] = 2; });
-
-            Assert.That(ex2.Message, Does.Match(@"Cannot apply indexing with \[\] to an expression of type .*"));
-
+            Assert.That(ex2!.Message, Does.Match(@"Cannot apply indexing with \[\] to an expression of type .*"));
         }
 
         public interface IAlpha
@@ -139,6 +118,7 @@ namespace ClaySharp.Tests
             string Hello();
             string Foo();
         }
+
         public class Alpha
         {
             public virtual string Hello()
@@ -180,7 +160,6 @@ namespace ClaySharp.Tests
 
             Assert.Throws<RuntimeBinderException>(() => dynamically.MissingNotHandled());
         }
-
 
         public class Beta
         {

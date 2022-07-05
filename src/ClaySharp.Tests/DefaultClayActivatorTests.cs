@@ -10,7 +10,9 @@ namespace ClaySharp.Tests
     [TestFixture]
     public class DefaultClayActivatorTests
     {
-        private IClayActivator _activator;
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        IClayActivator _activator;
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         [SetUp]
         public void Init()
@@ -35,12 +37,9 @@ namespace ClaySharp.Tests
             {
             }
 
-            public virtual string Hello { get { return "World"; } }
+            public virtual string Hello => "World";
 
-            public virtual int Add(int left, int right)
-            {
-                return left + right;
-            }
+            public virtual int Add(int left, int right) => left + right;
         }
 
         public interface IClayPlus
@@ -61,7 +60,6 @@ namespace ClaySharp.Tests
         [Test]
         public void SubclassMembersRemainAvailableStaticallyAndDynamicallyAndViaInterface()
         {
-
             var alpha = ClayActivator.CreateInstance<ClayPlus>(new[] { new InterfaceProxyBehavior() });
 
             dynamic dynamically = alpha;
@@ -82,22 +80,20 @@ namespace ClaySharp.Tests
 
         public class Anything
         {
-            private readonly string _helloText;
+            readonly string? _helloText;
 
             public Anything()
             {
             }
+
             public Anything(string helloText)
             {
                 _helloText = helloText;
             }
 
-            public virtual string Hello { get { return _helloText ?? "World"; } }
+            public virtual string Hello => _helloText ?? "World";
 
-            public virtual int Add(int left, int right)
-            {
-                return left + right;
-            }
+            public virtual int Add(int left, int right) => left + right;
         }
 
         [Test]
@@ -109,7 +105,6 @@ namespace ClaySharp.Tests
 
             Assert.That(type, Is.Not.EqualTo(typeof(Anything)));
             Assert.That(typeof(Anything).IsAssignableFrom(type));
-
         }
 
         [Test]
@@ -133,7 +128,6 @@ namespace ClaySharp.Tests
             Assert.That(interfacially.Add(3, 5), Is.EqualTo(8));
             Assert.That(interfacially.Add(3, 6), Is.EqualTo(9));
         }
-
 
         [Test]
         public void BehaviorsCanFilterVirtualMethods()
@@ -177,9 +171,6 @@ namespace ClaySharp.Tests
 
                 return proceed();
             }
-
         }
-
-
     }
 }
